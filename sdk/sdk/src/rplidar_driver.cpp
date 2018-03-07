@@ -71,6 +71,7 @@ RPlidarDriverSerialImpl::RPlidarDriverSerialImpl()
     : _isConnected(false)
     , _isScanning(false)
     , _isSupportingMotorCtrl(false)
+    , _isForced(false)
 {
     _rxtx = rp::hal::serial_rxtx::CreateRxTx();
     _cached_scan_node_count = 0;
@@ -235,6 +236,8 @@ u_result RPlidarDriverSerialImpl::startScanNormal(bool force, _u32 timeout)
     if (!isConnected()) return RESULT_OPERATION_FAIL;
     if (_isScanning) return RESULT_ALREADY_DONE;
 
+    _isForced = force;
+
     stop(); //force the previous operation to stop
 
     {
@@ -390,11 +393,12 @@ u_result RPlidarDriverSerialImpl::_cacheScanData()
 
         for (size_t pos = 0; pos < count; ++pos)
         {
-            if (local_buf[pos].sync_quality & RPLIDAR_RESP_MEASUREMENT_SYNCBIT)
+            if (_isForced || (local_buf[pos].sync_quality & RPLIDAR_RESP_MEASUREMENT_SYNCBIT))
             {
                 // only publish the data when it contains a full 360 degree scan 
                 
-                if ((local_scan[0].sync_quality & RPLIDAR_RESP_MEASUREMENT_SYNCBIT)) {
+                if (_isForced || (local_scan[0].sync_quality & RPLIDAR_RESP_MEASUREMENT_SYNCBIT)) 
+                {
                     _lock.lock();
                     memcpy(_cached_scan_node_buf, local_scan, scan_count*sizeof(rplidar_response_measurement_node_t));
                     _cached_scan_node_count = scan_count;
