@@ -30,3 +30,5 @@ Quality: 12h Angle: 352.97 Dist: 01459.50
 ```
 
 The Quality field is a raw 8-bit value returned by the firmware. Due to motor not spinning, it will lack the synchronization bit (bit 0). The reported scan angle can be ignored.
+
+Note that the program will not report anything when the firmware has measured an invalid sample (usually out of range or too weak reflection). It will simply wait for a valid sample.
