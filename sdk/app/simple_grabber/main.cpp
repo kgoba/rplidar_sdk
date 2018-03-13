@@ -111,11 +111,12 @@ u_result capture_and_display(RPlidarDriver * drv)
     
     rplidar_response_measurement_node_t nodes[360*2];
     size_t   count = _countof(nodes);
+    _u32 timestamp;
 
     printf("waiting for data...\n");
 
     // fetech extactly one 0-360 degrees' scan
-    ans = drv->grabScanData(nodes, count);
+    ans = drv->grabScanData(nodes, count, timestamp);
     if (IS_OK(ans) || ans == RESULT_OPERATION_TIMEOUT) {
         drv->ascendScanData(nodes, count);
         plot_histogram(nodes, count);

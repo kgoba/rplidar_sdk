@@ -391,6 +391,8 @@ u_result RPlidarDriverSerialImpl::_cacheScanData()
             }
         }
 
+        //_u32 timestamp = getms();
+
         for (size_t pos = 0; pos < count; ++pos)
         {
             if (_isForced || (local_buf[pos].sync_quality & RPLIDAR_RESP_MEASUREMENT_SYNCBIT))
@@ -402,6 +404,7 @@ u_result RPlidarDriverSerialImpl::_cacheScanData()
                     _lock.lock();
                     memcpy(_cached_scan_node_buf, local_scan, scan_count*sizeof(rplidar_response_measurement_node_t));
                     _cached_scan_node_count = scan_count;
+                    //_cached_scan_timestamp = timestamp;
                     _dataEvt.set();
                     _lock.unlock();
                 }
@@ -525,7 +528,7 @@ u_result RPlidarDriverSerialImpl::_cacheCapsuledScanData()
     return RESULT_OK;
 }
 
-u_result RPlidarDriverSerialImpl::grabScanData(rplidar_response_measurement_node_t * nodebuffer, size_t & count, _u32 timeout)
+u_result RPlidarDriverSerialImpl::grabScanData(rplidar_response_measurement_node_t * nodebuffer, size_t & count, _u32 & timestamp, _u32 timeout)
 {
     switch (_dataEvt.wait(timeout))
     {
@@ -542,6 +545,8 @@ u_result RPlidarDriverSerialImpl::grabScanData(rplidar_response_measurement_node
 
             memcpy(nodebuffer, _cached_scan_node_buf, size_to_copy*sizeof(rplidar_response_measurement_node_t));
             count = size_to_copy;
+            //timestamp = _cached_scan_timestamp;
+            timestamp = getms();
             _cached_scan_node_count = 0;
         }
         return RESULT_OK;

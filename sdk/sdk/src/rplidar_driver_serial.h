@@ -74,7 +74,7 @@ public:
     virtual u_result checkExpressScanSupported(bool & support, _u32 timeout = DEFAULT_TIMEOUT);
 
     virtual u_result stop(_u32 timeout = DEFAULT_TIMEOUT);
-    virtual u_result grabScanData(rplidar_response_measurement_node_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
+    virtual u_result grabScanData(rplidar_response_measurement_node_t * nodebuffer, size_t & count, _u32 & timestamp, _u32 timeout = DEFAULT_TIMEOUT);
     virtual u_result ascendScanData(rplidar_response_measurement_node_t * nodebuffer, size_t count);
 
 protected:
@@ -100,6 +100,7 @@ protected:
     rp::hal::serial_rxtx  * _rxtx;
     rplidar_response_measurement_node_t      _cached_scan_node_buf[2048];
     size_t                                   _cached_scan_node_count;
+    _u32                                     _cached_scan_timestamp;
 
     _u16                    _cached_sampleduration_std;
     _u16                    _cached_sampleduration_express;

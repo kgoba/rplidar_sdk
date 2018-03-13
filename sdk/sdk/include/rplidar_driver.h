@@ -186,7 +186,7 @@ public:
     /// The interface will return RESULT_OPERATION_TIMEOUT to indicate that no complete 360-degrees' scan can be retrieved withing the given timeout duration. 
     ///
     /// \The caller application can set the timeout value to Zero(0) to make this interface always returns immediately to achieve non-block operation.
-	virtual u_result grabScanData(rplidar_response_measurement_node_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT) = 0;
+	virtual u_result grabScanData(rplidar_response_measurement_node_t * nodebuffer, size_t & count, _u32 & timestamp, _u32 timeout = DEFAULT_TIMEOUT) = 0;
 
     /// Ascending the scan data according to the angle value in the scan.
     ///

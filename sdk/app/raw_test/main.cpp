@@ -62,49 +62,6 @@ void print_usage(int argc, const char * argv[])
 }
 
 
-void plot_histogram(rplidar_response_measurement_node_t * nodes, size_t count)
-{
-    const int BARCOUNT =  75;
-    const int MAXBARHEIGHT = 20;
-    const float ANGLESCALE = 360.0f/BARCOUNT;
-
-    float histogram[BARCOUNT];
-    for (int pos = 0; pos < _countof(histogram); ++pos) {
-        histogram[pos] = 0.0f;
-    }
-
-    float max_val = 0;
-    for (int pos =0 ; pos < (int)count; ++pos) {
-        int int_deg = (int)((nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f/ANGLESCALE);
-        if (int_deg >= BARCOUNT) int_deg = 0;
-        float cachedd = histogram[int_deg];
-        if (cachedd == 0.0f ) {
-            cachedd = nodes[pos].distance_q2/4.0f;
-        } else {
-            cachedd = (nodes[pos].distance_q2/4.0f + cachedd)/2.0f;
-        }
-
-        if (cachedd > max_val) max_val = cachedd;
-        histogram[int_deg] = cachedd;
-    }
-
-    for (int height = 0; height < MAXBARHEIGHT; ++height) {
-        float threshold_h = (MAXBARHEIGHT - height - 1) * (max_val/MAXBARHEIGHT);
-        for (int xpos = 0; xpos < BARCOUNT; ++xpos) {
-            if (histogram[xpos] >= threshold_h) {
-                putc('*', stdout);
-            }else {
-                putc(' ', stdout);
-            }
-        }
-        printf("\n");
-    }
-    for (int xpos = 0; xpos < BARCOUNT; ++xpos) {
-        putc('-', stdout);
-    }
-    printf("\n");
-}
-
 u_result capture_and_display(RPlidarDriver * drv)
 {
     u_result ans;
@@ -115,8 +72,8 @@ u_result capture_and_display(RPlidarDriver * drv)
     printf("waiting for data...\n");
 
     while (true) {
-        // fetch extactly one 0-360 degrees' scan
-        ans = drv->grabScanData(nodes, count);
+        _u32 timestamp;
+        ans = drv->grabScanData(nodes, count, timestamp);
         if (IS_OK(ans) || ans == RESULT_OPERATION_TIMEOUT) {
             for (int pos = 0; pos < (int)count ; ++pos) {
                 //if (nodes[pos].angle_q6_checkbit != 0 && nodes[pos].distance_q2 != 0) 

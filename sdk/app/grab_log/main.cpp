@@ -169,11 +169,21 @@ int main(int argc, const char * argv[]) {
         if (IS_OK(op_result)) {
             drv->ascendScanData(nodes, count);
             for (int pos = 0; pos < (int)count ; ++pos) {
-                printf("%s theta: %03.2f Dist: %08.2f Q: %d \n", 
-                    (nodes[pos].sync_quality & RPLIDAR_RESP_MEASUREMENT_SYNCBIT) ?"S ":"  ", 
-                    (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f,
-                    nodes[pos].distance_q2/4.0f,
-                    nodes[pos].sync_quality >> RPLIDAR_RESP_MEASUREMENT_QUALITY_SHIFT);
+                if (pos == (int)count - 1) {
+                    printf("%02X,%03.2f,%08.2f,%d\n", 
+                        nodes[pos].sync_quality, 
+                        (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f,
+                        nodes[pos].distance_q2/4.0f,
+                        timestamp
+                    );
+                }
+                else {
+                    printf("%02X,%03.2f,%08.2f,\n", 
+                        nodes[pos].sync_quality, 
+                        (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f,
+                        nodes[pos].distance_q2/4.0f
+                    );                    
+                }
             }
         }
 
